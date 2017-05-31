@@ -8,7 +8,7 @@ import random
 class FaceDataLayer(caffe.Layer):
 	"""
 	Load (face image, face label) pairs from created dataset
-	The input size is fixed to be 1 x 3 x 224 x 224
+	The input size is fixed to be batchsize x 3 x 224 x 224
 	"""
 
 	def setup(self, bottom, top):
