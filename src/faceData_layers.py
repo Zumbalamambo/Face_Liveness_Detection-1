@@ -4,61 +4,96 @@ import numpy as np
 from PIL import Image
 import copy
 
+"""
+Reference: 
+https://github.com/BVLC/caffe/blob/master/examples/pycaffe/layers/pascal_multilabel_datalayers.py
+https://github.com/yunfan0621/fcn.berkeleyvision.org/blob/master/voc_layers.py
+"""
+
 class FaceDataLayer(caffe.Layer):
 	"""
 	Load (face image, face label) pairs from created dataset
-	The input size is fixed to be batchsize x 3 x 224 x 224
+	The input image size is fixed to be 3 x 224 x 224 with 2 labels
 	"""
 
 	def setup(self, bottom, top):
-		"""
-		Setup data layer according to parameters:
 
-		- data_dir:  path to image file list (a list of paths)
-		- label_dir: path to label list (a list of labels)
-		- split:     train / val / test
-		- mean:      tuple of mean values to subtract
-		- batchsize: size of batch		
-
-		"""
+		self.top_names = ['data', 'label']
 
 		# start config
 		params = eval(self.param_str) # do param_str in python console (create dict)
-		self.data_dir = params['data_dir']
-		self.label_dir = params['label_dir'] 
-		self.split = params['split']
-		self.mean = np.array(params['mean'])
-		self.batch_size = params['batch_size']
 		
-		# load image paths and their labels (both are list of strings)
-		self.image_paths = open(self.data_dir).read().splitlines()
-		self.labels = open(self.label_dir).read().splitlines()
-		self.num_samples = len(image_paths)		
+		"""
+		self.split = params['split']
+		"""
 
-		# set the dataset offset to 0
-		self.offset = 0
+		self.batch_size = params['batch_size']
+		self.batch_loader = BatchLoader(params, None)
 
-	def reshape(self, bottom, top):
-		# called before every forward(), load image and label to net
-		# reshape two top blobs to define data shape. For details, see:
-		# https://github.com/BVLC/caffe/blob/master/examples/pycaffe/layers/pascal_multilabel_datalayers.py
+		"""
+		since we use a fixed input image size, reshape the data layer only once
+		and save it from be called every time in reshape()
+		"""
+		top[0].reshape(self.batch_size, 3, 224, 224)
+		top[1].reshape(self.batch_size, 2)
 
 	def forward(self, bottom, top):
 		# assign output for top blob
-		top[0].data[...] = self.data
-		top[1].data[...] = self.label
+		for iter in range(self.batch_size):
+			# load (image, label) pair via batch loader
+			# NOTE: only one single pair is loaded at a time (not a batch)
+			im, label = self.batch_loader.load_next_pair()
 
-		# pick next batch, shuffle if necessary
-		# TODO		
+			# assign data and label to data layer
+			top[0].data[iter, ...] = im
+			top[1].data[iter, ...] = label
 
 	def backward(self, top, propagate_down, bottome):
 		pass
+
+	def reshape(self, bottom, top):
+		# reshaping done in layer setup
+		pass
+
+
+class BatchLoader(object);
+	
+    """
+    This class abstracts away the loading of images (for ease of debugging)
+    Images can either be loaded singly, or in a batch.
+    """
+
+    def __init__(self, params, result):
+ 		# load image paths and their labels (both are list of strings)
+		self.image_paths = open(params.data_dir).read().splitlines()
+		self.labels = open(params.label_dir).read().splitlines() 
+    	self.batch_size = params['batch_size']
+    	self.mean = np.array(params['mean'])
+    	self._cur = 0 # index of current image
+
+	def get_next_batch(self):
+		# return the next batch of (image, label) pairs
+
+		# check whether an epoch has been finished
+		if self._cur == len(self.image_paths):
+			self._cur = 0
+			self.shuffle_dataset()
+
+		im = np.asarray(Image.open(self.image_paths[self._cur]))
+		label = int(self.labels[self._cur])
+
+        # do a simple horizontal flip as data augmentation
+        flip = np.random.choice(2)*2-1
+        im = im[:, ::flip, :]
+
+        self._cur += 1
+        return self.preprocessor(im), label
 
 	def shuffle_dataset(self):
 		# shuffle the dataset
 
 		# shuffle the image path and label using the same permutation
-		permute_idx = np.random.permutation(self.num_samples)
+		permute_idx = np.random.permutation(len(self.image_paths))
 		image_paths_tmp = [self.image_paths[i] for i in permute_idx]
 		labels_tmp = [self.labels[i] for i in permute_idx]
 		
@@ -66,19 +101,19 @@ class FaceDataLayer(caffe.Layer):
 		self.labels = copy.copy(labels_tmp)
 
 		# reset the offset
-		self.offset = 0
+		self._cur = 0
 
-	def get_next_batch(self):
-		# return the next batch of (image, label) pairs
-		start_offset = self.offset
-		self.offset += self.batch_size
+	def preprocessor(self, im):
+		"""
+		preprocess the image for caffe use:
+		- cast to float
+		- switch channels RGB -> BGR
+		- subtract mean
+		- transpose to channel x height x width order
+		"""
 
-		if self.offset > self.num_samples:
-			# current epoch finished
-			self.shuffle_dataset()
-			start_offset = 0
-			self.offset = batch_size
-		
-		end_offset = self.offset
-
-		
+		im = np.array(im, dtype=np.float32)
+		im = im[:,:,::-1]
+		im -= self.mean # the order of mean should be BGR
+		im = im.transpose((2, 0, 1))
+		return im
