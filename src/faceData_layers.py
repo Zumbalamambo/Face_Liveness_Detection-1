@@ -65,8 +65,8 @@ class BatchLoader(object);
 
     def __init__(self, params, result):
  		# load image paths and their labels (both are list of strings)
-		self.image_paths = open(params.data_dir).read().splitlines()
-		self.labels = open(params.label_dir).read().splitlines() 
+		self.image_paths = open(params['data_dir']).read().splitlines()
+		self.labels = open(params['label_dir']).read().splitlines() 
     	self.batch_size = params['batch_size']
     	self.mean = np.array(params['mean'])
     	self._cur = 0 # index of current image
