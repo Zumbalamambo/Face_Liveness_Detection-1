@@ -4,28 +4,32 @@ from caffe.coord_map import crop
 
 def conv_relu(bottom, nout, ks=3, stride=1, pad=1):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
-        num_output=nout, pad=pad,
-        param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)])
+                         num_output=nout, pad=pad,
+                         param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)])
     return conv, L.ReLU(conv, in_place=True)
 
 def max_pool(bottom, ks=2, stride=2):
 	return L.Pooling(bottom, pool=P.Pooling.MAX, kernel_size=ks, stride=stride)
 
+def fc_relu_dropout(bottom, nout, ratio):
+    fc = L.InnerProduct(bottom, num_output=nout)
+    relu = L.ReLU(fc, in_place=True)
+    dropout = L.Dropout(relu, dropout_ratio=ratio, in_place=True)
+    return fc, relu, dropout
+
 def vgg_face(split, batch_size):
 	n = caffe.NetSpec()
 
 	# config python data layer
-	pydata_params = dict(split=split, mean=(104.00699, 116.66877, 122.67892))
-	if split == 'train':
-		pydata_params['data_dir'] = 
-	else:
-		pydata_params['data_dir'] = 
+	pydata_params = dict(split=split, mean=(89.7647, 106.3760, 139.7756),
+                         data_root='../data/')
 
 	n.data, n.label = L.Python(module='faceData_layers', 
 		                       layer='FaceDataLayer', 
 		                       ntop=2, param_str=str(pydata_params))
 
 	# vgg-face net
+    # conv layers
     n.conv1_1, n.relu1_1 = conv_relu(n.data, 64)
     n.conv1_2, n.relu1_2 = conv_relu(n.relu1_1, 64)
     n.pool1 = max_pool(n.relu1_2)
@@ -49,7 +53,34 @@ def vgg_face(split, batch_size):
     n.conv5_3, n.relu5_3 = conv_relu(n.relu5_2, 512)
 	n.pool5 = max_pool(n.relu5_3)
 
-	# TODO: deal with dropout layer
+	# drop out and fc layers
+    n.fc6, n.relu6, n.drop6 = fc_relu_dropout(n.pool5, 4096, 0.5)
+    n.fc7, n.relu7, n.drop7 = fc_relu_dropout(n.fc6, 4096, 0.5)
+    n.fc8_face = L.InnerProduct(n.fc7, num_output=1024, 
+                                param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)], 
+                                weight_filler=dict(type='xavier'), 
+                                bias_filler=dict(type='constant', value=0)
+                                )
+    n.fc9_face = L.InnerProduct(n.fc8_face, num_output=2, 
+                                param=[dict(lr_mult=1, decay_mult=1), dict(lr_mult=2, decay_mult=0)], 
+                                weight_filler=dict(type='xavier'), 
+                                bias_filler=dict(type='constant', value=0)
+                                )
+
+    # loss layer
+    n.loss = L.SoftmaxWithLoss(n.fc9_face, n.label)
+
+    return n.to_proto()
+
+def make_net():
+    with open('../model/vgg_face_caffe/train.prototxt', 'w') as f:
+        f.write( str ( vgg_face('train', 5) ) )
+
+    with open('../model/vgg_face_caffe/val.prototxt', 'w') as f:
+        f.write( str( vgg_face('val', 5) ) )
+
+if __name__ == '__main__':
+    make_net()
 
 
 
