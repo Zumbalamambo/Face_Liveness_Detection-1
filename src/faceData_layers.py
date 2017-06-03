@@ -31,7 +31,7 @@ class FaceDataLayer(caffe.Layer):
 		and save it from be called every time in reshape()
 		"""
 		top[0].reshape(self.batch_size, 3, 224, 224)
-		top[1].reshape(self.batch_size, 2)
+		top[1].reshape(self.batch_size, 1)
 
 	def forward(self, bottom, top):
 		# assign output for top blob
@@ -44,7 +44,7 @@ class FaceDataLayer(caffe.Layer):
 			top[0].data[iter, ...] = im
 			top[1].data[iter, ...] = label
 
-	def backward(self, top, propagate_down, bottome):
+	def backward(self, top, propagate_down, bottom):
 		pass
 
 	def reshape(self, bottom, top):
@@ -52,26 +52,26 @@ class FaceDataLayer(caffe.Layer):
 		pass
 
 
-class BatchLoader(object);
+class BatchLoader(object):
 	
-    """
+	"""
     This class abstracts away the loading of images (for the ease of debugging)
     Images are loaded individually.
     """
 
-    def __init__(self, params, result):
- 		# load image paths and their labels (both are list of strings)
+	def __init__(self, params, result):
+			# load image paths and their labels (both are list of strings)
 
- 		self.data_dir = params['data_dir']
+		self.data_dir = params['data_dir']
 		self.split = params['split']
 		self.image_paths = open('{}/{}_images.txt'.format(self.data_dir, self.split)).read().splitlines()
 		self.labels      = open('{}/{}_labels.txt'.format(self.data_dir, self.split)).read().splitlines()
-    	
-    	self.batch_size = params['batch_size']
-    	self.mean = np.array(params['mean'])
-    	self._cur = 0 # index of current image
+		
+		self.batch_size = params['batch_size']
+		self.mean = np.array(params['mean'])
+		self._cur = 0 # index of current image
 
-	def get_next_batch(self):
+	def load_next_pair(self):
 		# return the next batch of (image, label) pairs
 
 		# check whether an epoch has been finished
@@ -82,12 +82,12 @@ class BatchLoader(object);
 		im = np.asarray(Image.open('{}/{}'.format(self.data_dir, self.image_paths[self._cur])))
 		label = int(self.labels[self._cur])
 
-        # do a simple horizontal flip as data augmentation
-        flip = np.random.choice(2)*2-1
-        im = im[:, ::flip, :]
+		# do a simple horizontal flip as data augmentation
+		flip = np.random.choice(2)*2-1
+		im = im[:, ::flip, :]
 
-        self._cur += 1
-        return self.preprocessor(im), label
+		self._cur += 1
+		return self.preprocessor(im), label
 
 	def shuffle_dataset(self):
 		# shuffle the dataset

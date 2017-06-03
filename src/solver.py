@@ -9,14 +9,13 @@ def make_solver(train_net_path, val_net_path, solver_path, snapshot_path):
 
 	# specify parameters for iterations
 	s.test_interval = 500 # interval for invoking testing
-	s.test_iter.append(100) # number of batches used for testing
+	s.test_iter.append(20) # number of batches used for testing
 	s.max_iter = 100000
 
 	# specify parameters for learning policy
-	s.base_lr = 1e-6
+	s.base_lr = 1e-8
 	s.lr_policy = "step"
 	s.gamma = 0.1
-	s.step = 20000
 
 	s.type = "Adam"
 	s.momentum = 0.9
@@ -29,6 +28,7 @@ def make_solver(train_net_path, val_net_path, solver_path, snapshot_path):
 	s.snapshot_prefix = snapshot_path
 	s.solver_mode = caffe_pb2.SolverParameter.GPU
 
+	print "Writing prototxt file for solver..."
 	with open(solver_path, 'w') as f:
 		f.write(str(s))
 
