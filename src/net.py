@@ -73,6 +73,10 @@ def vgg_face(split, batch_size):
     # loss layer
     n.loss = L.SoftmaxWithLoss(n.fc9_face, n.label)
 
+    # accuracy layer for validation net
+    if split == 'val':
+        n.acc = L.Accuracy(n.fc9_face, n.label)
+
     return n.to_proto()
 
 def make_net(train_net_path, train_batch_size, val_net_path,  val_batch_size):

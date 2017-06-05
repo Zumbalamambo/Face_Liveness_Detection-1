@@ -2,4 +2,5 @@ data/all_img
 data/*.txt
 model/vgg_face_caffe.tar.gz
 model/vgg_face_caffe/VGG_FACE.caffemodel
+model/vgg_face_caffe/snapshots
 *.pyc

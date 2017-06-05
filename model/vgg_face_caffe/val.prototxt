@@ -6,7 +6,7 @@ layer {
   python_param {
     module: "faceData_layers"
     layer: "FaceDataLayer"
-    param_str: "{\'data_dir\': \'../data/\', \'split\': \'val\', \'batch_size\': 1, \'mean\': (89.7647, 106.376, 139.7756)}"
+    param_str: "{\'data_dir\': \'../data/\', \'split\': \'val\', \'batch_size\': 10, \'mean\': (89.7647, 106.376, 139.7756)}"
   }
 }
 layer {
@@ -522,4 +522,11 @@ layer {
   bottom: "fc9_face"
   bottom: "label"
   top: "loss"
+}
+layer {
+  name: "acc"
+  type: "Accuracy"
+  bottom: "fc9_face"
+  bottom: "label"
+  top: "acc"
 }

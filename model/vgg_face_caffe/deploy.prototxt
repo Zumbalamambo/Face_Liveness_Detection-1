@@ -1,14 +1,8 @@
-layer {
-  name: "data"
-  type: "Python"
-  top: "data"
-  top: "label"
-  python_param {
-    module: "faceData_layers"
-    layer: "FaceDataLayer"
-    param_str: "{\'data_dir\': \'../data/\', \'split\': \'train\', \'batch_size\': 10, \'mean\': (89.7647, 106.376, 139.7756)}"
-  }
-}
+input: "data"
+input_dim: 1
+input_dim: 3
+input_dim: 224
+input_dim: 224
 layer {
   name: "conv1_1"
   type: "Convolution"
@@ -515,11 +509,4 @@ layer {
       value: 0
     }
   }
-}
-layer {
-  name: "loss"
-  type: "SoftmaxWithLoss"
-  bottom: "fc9_face"
-  bottom: "label"
-  top: "loss"
 }
