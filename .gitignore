@@ -1,4 +1,5 @@
 data/all_img
+data/test_img
 data/*.txt
 model/vgg_face_caffe.tar.gz
 model/vgg_face_caffe/VGG_FACE.caffemodel

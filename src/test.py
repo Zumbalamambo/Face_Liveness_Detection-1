@@ -17,38 +17,64 @@ def img_preprocess(im_path, mean=(89.7647, 106.3760, 139.7756)):
 	return in_
 
 if __name__ =='__main__':
+
+	# init
+	caffe.set_device(int(sys.argv[1]))
+	caffe.set_mode_gpu()
+	
 	# define which model to use
 	snapshot_path = "../model/vgg_face_caffe/snapshots"
-	model_iter = 20000;
+	model_iter = 30000;
 	model_name = '{}/snapshots_iter_{}.caffemodel'.format(snapshot_path, model_iter)
 
+	# create test net
+	test_batch_size = 100
+	test_prototxt_path = "../model/vgg_face_caffe/test.prototxt"
+	net.make_net(test_prototxt_path, 'test', test_batch_size)
+
+	# load net
+	net = caffe.Net(test_prototxt_path, model_name, caffe.TEST)
+
+	# start infer
+	num_test_samples = 16511
+	niter = int( np.floor( 1.0*num_test_samples/test_batch_size ) )
+
+	correct_cnt = 0
+	total_cnt = 0
+	for iter in range(niter):
+
+		net.forward()
+
+		preds  = net.blobs['fc9_face'].data.argmax(axis=1)
+		labels = net.blobs['label'].data
+
+		correct_cnt += np.sum(preds == np.ndarray.flatten(labels))
+		total_cnt += test_batch_size
+		acc = 1.0 * correct_cnt / total_cnt
+
+		print "Progress: {}/{}; Accuracy: {} ({}/{})".format(iter+1, niter, 
+														acc, correct_cnt, total_cnt)
+
+	total_acc = 1.0 * correct_cnt / total_cnt
+	print "Total accuracy is {} ({}/{})".format(total_acc, correct_cnt, total_cnt)
+
+	
+	'''
 	# load net
 	prototxt_path   = "../model/vgg_face_caffe/deploy.prototxt"
 	net = caffe.Net(prototxt_path, model_name, caffe.TEST)
 
-	# open test file
-	test_image_paths = open("../data/test_images.txt").read().splitlines()
-	test_labels = open("../data/test_labels.txt").read().splitlines()
-	test_labels = [int(i) for i in test_labels]
+	test_image_paths = open("../data/test_img/neg_resize_test_img_list.txt").read().splitlines()
 
-	# start infer
-	correct_cnt = 0
-	total_cnt = 0
-	for image, label in zip(test_image_paths, test_labels):
-		
-		total_cnt += 1
-		if total_cnt % 100 == 0:
-			acc = float(correct_cnt) / total_cnt
-			print "Testing on {}th Image, accuracy is {} ({}/{})".format(total_cnt, acc, correct_cnt, total_cnt)
-
-		im = img_preprocess('../data/' + image)
+	neg_cnt = 0
+	for test_img in test_image_paths:
+		im = img_preprocess("../data/test_img/" + test_img)
 		net.blobs['data'].data[...] = im
 		net.forward()
 		pred = net.blobs['fc9_face'].data[0].argmax(axis=0)
 
-		if pred == label:
-			correct_cnt += 1
+		if pred == 0:
+			neg_cnt += 1
 
-	total_acc = float(correct_cnt) / total_cnt
-	print "Total accuracy is {} ({}/{})".format(total_acc, correct_cnt, total_cnt)
-
+	print neg_cnt
+	'''

@@ -11,7 +11,7 @@ momentum: 0.9
 weight_decay: 0.0005
 stepsize: 2000
 snapshot: 2000
-snapshot_prefix: "../model/vgg_face_caffe/snapshots"
+snapshot_prefix: "../model/vgg_face_caffe/snapshots/model"
 solver_mode: GPU
 iter_size: 1
 type: "Adam"

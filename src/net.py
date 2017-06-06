@@ -79,11 +79,8 @@ def vgg_face(split, batch_size):
 
     return n.to_proto()
 
-def make_net(train_net_path, train_batch_size, val_net_path,  val_batch_size):
-    print "Writing prototxt file for train net..."
-    with open(train_net_path, 'w') as f:
-        f.write( str ( vgg_face('train', train_batch_size) ) )
+def make_net(net_path, split, batch_size):
 
-    print "Writing prototxt file for validation net..."
-    with open(val_net_path, 'w') as f:
-        f.write( str( vgg_face('val', val_batch_size) ) )
+    print "Writing prototxt file for train net..."
+    with open(net_path, 'w') as f:
+        f.write( str ( vgg_face(split, batch_size) ) )
