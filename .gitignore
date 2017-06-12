@@ -1,6 +1,6 @@
 data/myData/all_img
 data/myData/test_img
-data/*.txt
+data/myData/*.txt
 model/vgg_face_caffe.tar.gz
 model/vgg_face_caffe/VGG_FACE.caffemodel
 model/vgg_face_caffe/snapshots
