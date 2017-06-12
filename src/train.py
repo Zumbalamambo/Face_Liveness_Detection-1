@@ -22,8 +22,8 @@ snapshot_path       = "../model/vgg_face_caffe/snapshots/model"
 # 2. Shall we remove Dropout layer in val.prototxt? No
 train_batch_size = 10
 val_batch_size   = 10
-net.make_net(train_prototxt_path, 'train', train_batch_size)
-net.make_net(val_prototxt_path, 'val', val_batch_size)
+net.make_net(train_prototxt_path, 'train', train_batch_size, '../data')
+net.make_net(val_prototxt_path, 'val', val_batch_size, , '../data')
 solver.make_solver(train_prototxt_path, val_prototxt_path, solver_path, snapshot_path)
 
 # Read in solver and pre-trained parameters

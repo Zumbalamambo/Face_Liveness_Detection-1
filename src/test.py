@@ -30,7 +30,7 @@ if __name__ =='__main__':
 	# create test net
 	test_batch_size = 100
 	test_prototxt_path = "../model/vgg_face_caffe/test.prototxt"
-	net.make_net(test_prototxt_path, 'test', test_batch_size)
+	net.make_net(test_prototxt_path, 'test', test_batch_size, '../data')
 
 	# load net
 	net = caffe.Net(test_prototxt_path, model_name, caffe.TEST)
@@ -57,24 +57,3 @@ if __name__ =='__main__':
 
 	total_acc = 1.0 * correct_cnt / total_cnt
 	print "Total accuracy is {} ({}/{})".format(total_acc, correct_cnt, total_cnt)
-
-	
-	'''
-	# load net
-	prototxt_path   = "../model/vgg_face_caffe/deploy.prototxt"
-	net = caffe.Net(prototxt_path, model_name, caffe.TEST)
-
-	test_image_paths = open("../data/test_img/neg_resize_test_img_list.txt").read().splitlines()
-
-	neg_cnt = 0
-	for test_img in test_image_paths:
-		im = img_preprocess("../data/test_img/" + test_img)
-		net.blobs['data'].data[...] = im
-		net.forward()
-		pred = net.blobs['fc9_face'].data[0].argmax(axis=0)
-
-		if pred == 0:
-			neg_cnt += 1
-
-	print neg_cnt
-	'''

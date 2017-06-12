@@ -20,12 +20,12 @@ def fc_relu_dropout(bottom, nout, ratio, lr_shrink=10):
     dropout = L.Dropout(relu, dropout_ratio=ratio, in_place=True)
     return fc, relu, dropout
 
-def vgg_face(split, batch_size):
+def vgg_face(split, batch_size, data_dir='../data'):
     n = caffe.NetSpec()
 
     # config python data layer (mean values are about the same for every subset)
     pydata_params = dict(split=split, mean=(89.7647, 106.3760, 139.7756),
-                         data_dir='../data/', batch_size=batch_size)
+                         data_dir=data_dir, batch_size=batch_size)
 
     n.data, n.label = L.Python(module='faceData_layers', layer='FaceDataLayer', 
                                ntop=2, param_str=str(pydata_params))
@@ -79,8 +79,8 @@ def vgg_face(split, batch_size):
 
     return n.to_proto()
 
-def make_net(net_path, split, batch_size):
+def make_net(net_path, split, batch_size, data_dir='../data'):
 
     print "Writing prototxt file for train net..."
     with open(net_path, 'w') as f:
-        f.write( str ( vgg_face(split, batch_size) ) )
+        f.write( str ( vgg_face(split, batch_size, data_dir) ) )
