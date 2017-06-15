@@ -6,7 +6,7 @@ layer {
   python_param {
     module: "faceData_layers"
     layer: "FaceDataLayer"
-    param_str: "{\'data_dir\': \'../data/\', \'split\': \'test\', \'batch_size\': 100, \'mean\': (89.7647, 106.376, 139.7756)}"
+    param_str: "{\'data_dir\': \'../data/3rd_party/MSU-MFSD\', \'split\': \'test\', \'batch_size\': 100, \'mean\': (110.3397, 125.8261, 155.2444)}"
   }
 }
 layer {
