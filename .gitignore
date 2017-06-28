@@ -6,4 +6,9 @@ data/MSU-MFSD/*.txt
 model/vgg_face_caffe.tar.gz
 model/vgg_face_caffe/VGG_FACE.caffemodel
 model/myData/snapshots
+data/cbsr_antispoofing/
+data/replayattack/
+model/MSU-MFSD/
+model/cbsr_antispoofing/
+model/replayattack/
 *.pyc

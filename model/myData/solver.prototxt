@@ -1,5 +1,5 @@
-train_net: "../model/vgg_face_caffe/train.prototxt"
-test_net: "../model/vgg_face_caffe/val.prototxt"
+train_net: "../model/myData/train.prototxt"
+test_net: "../model/myData/val.prototxt"
 test_iter: 500
 test_interval: 500
 base_lr: 1e-06
@@ -11,7 +11,7 @@ momentum: 0.9
 weight_decay: 0.0005
 stepsize: 2000
 snapshot: 2000
-snapshot_prefix: "../model/vgg_face_caffe/snapshots/model"
+snapshot_prefix: "../model/myData/snapshots/myData"
 solver_mode: GPU
 iter_size: 1
 type: "Adam"

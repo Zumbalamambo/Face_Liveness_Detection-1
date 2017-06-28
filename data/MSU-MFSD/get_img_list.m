@@ -26,8 +26,8 @@ fclose(fileID);
 % list for all images
 pos_reader = fopen('pos_img_list.txt', 'r');
 neg_reader = fopen('neg_img_list.txt', 'r');
-all_img_writer = fopen('test_images.txt', 'w');
-all_label_writer = fopen('test_labels.txt', 'w');
+all_img_writer   = fopen('test_all_images.txt', 'w');
+all_label_writer = fopen('test_all_labels.txt', 'w');
 
 neg_face_cnt = 0;
 while feof(neg_reader) == 0
@@ -60,8 +60,8 @@ pos_img_files = cell(pos_face_cnt, 1);
 neg_img_files = cell(neg_face_cnt, 1);
 all_img_files = cell(pos_face_cnt + neg_face_cnt, 1);
 all_labels = zeros(pos_face_cnt + neg_face_cnt, 1);
-all_img_reader = fopen('all_img_list.txt', 'r');
-all_label_reader = fopen('all_label_list.txt', 'r');
+all_img_reader   = fopen('test_all_images.txt', 'r');
+all_label_reader = fopen('test_all_labels.txt', 'r');
 
 ind = 0;
 while feof(all_img_reader) == 0

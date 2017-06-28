@@ -6,7 +6,7 @@ layer {
   python_param {
     module: "faceData_layers"
     layer: "FaceDataLayer"
-    param_str: "{\'data_dir\': \'../data/3rd_party/MSU-MFSD\', \'split\': \'test\', \'batch_size\': 100, \'mean\': (110.3397, 125.8261, 155.2444)}"
+    param_str: "{\'data_dir\': \'../data/myData\', \'split\': \'test_all\', \'batch_size\': 100, \'mean\': (67.768946, 84.579981, 126.852879)}"
   }
 }
 layer {
@@ -15,12 +15,12 @@ layer {
   bottom: "data"
   top: "conv1_1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 64
@@ -41,12 +41,12 @@ layer {
   bottom: "conv1_1"
   top: "conv1_2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 64
@@ -78,12 +78,12 @@ layer {
   bottom: "pool1"
   top: "conv2_1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 128
@@ -104,12 +104,12 @@ layer {
   bottom: "conv2_1"
   top: "conv2_2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 128
@@ -141,12 +141,12 @@ layer {
   bottom: "pool2"
   top: "conv3_1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 256
@@ -167,12 +167,12 @@ layer {
   bottom: "conv3_1"
   top: "conv3_2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 256
@@ -193,12 +193,12 @@ layer {
   bottom: "conv3_2"
   top: "conv3_3"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 256
@@ -230,12 +230,12 @@ layer {
   bottom: "pool3"
   top: "conv4_1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 512
@@ -256,12 +256,12 @@ layer {
   bottom: "conv4_1"
   top: "conv4_2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 512
@@ -282,12 +282,12 @@ layer {
   bottom: "conv4_2"
   top: "conv4_3"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 512
@@ -319,12 +319,12 @@ layer {
   bottom: "pool4"
   top: "conv5_1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 512
@@ -345,12 +345,12 @@ layer {
   bottom: "conv5_1"
   top: "conv5_2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 512
@@ -371,12 +371,12 @@ layer {
   bottom: "conv5_2"
   top: "conv5_3"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   convolution_param {
     num_output: 512
@@ -408,12 +408,12 @@ layer {
   bottom: "pool5"
   top: "fc6"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   inner_product_param {
     num_output: 4096
@@ -440,12 +440,12 @@ layer {
   bottom: "fc6"
   top: "fc7"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 1.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 2
-    decay_mult: 0
+    lr_mult: 2.0
+    decay_mult: 0.0
   }
   inner_product_param {
     num_output: 4096
@@ -472,22 +472,22 @@ layer {
   bottom: "fc7"
   top: "fc8_face"
   param {
-    lr_mult: 100
-    decay_mult: 1
+    lr_mult: 100.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 200
-    decay_mult: 0
+    lr_mult: 200.0
+    decay_mult: 0.0
   }
   inner_product_param {
     num_output: 1024
     weight_filler {
       type: "gaussian"
-      std: 0.01
+      std: 0.00999999977648
     }
     bias_filler {
       type: "constant"
-      value: 0
+      value: 0.0
     }
   }
 }
@@ -497,22 +497,22 @@ layer {
   bottom: "fc8_face"
   top: "fc9_face"
   param {
-    lr_mult: 100
-    decay_mult: 1
+    lr_mult: 100.0
+    decay_mult: 1.0
   }
   param {
-    lr_mult: 200
-    decay_mult: 0
+    lr_mult: 200.0
+    decay_mult: 0.0
   }
   inner_product_param {
     num_output: 2
     weight_filler {
       type: "gaussian"
-      std: 0.01
+      std: 0.00999999977648
     }
     bias_filler {
       type: "constant"
-      value: 0
+      value: 0.0
     }
   }
 }

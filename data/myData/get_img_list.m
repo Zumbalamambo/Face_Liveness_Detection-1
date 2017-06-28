@@ -2,9 +2,9 @@ clc; clear all; close all;
 
 %% Create image file list
 % list for positive images
-pos_img_path = fullfile('all_img', 'pos_img');
+pos_img_path = fullfile('.', 'cropped', 'positive');
 img_list = dir(pos_img_path);
-fileID = fopen(fullfile('pos_img_list.txt'), 'w');
+fileID = fopen(fullfile('.', 'pos_img_list.txt'), 'w');
 for i = 3 : length(img_list)
     img_name = img_list(i).name;
     img_path = fullfile(pos_img_path, img_name);
@@ -13,9 +13,9 @@ end
 fclose(fileID);
 
 % list for negative images
-neg_img_path = fullfile('all_img', 'neg_img');
+neg_img_path = fullfile('.', 'cropped', 'negative');
 img_list = dir(neg_img_path);
-fileID = fopen(fullfile('neg_img_list.txt'), 'w');
+fileID = fopen(fullfile('.', 'neg_img_list.txt'), 'w');
 for i = 3 : length(img_list)
     img_name = img_list(i).name;
     img_path = fullfile(neg_img_path, img_name);
@@ -26,8 +26,8 @@ fclose(fileID);
 % list for all images
 pos_reader = fopen('pos_img_list.txt', 'r');
 neg_reader = fopen('neg_img_list.txt', 'r');
-all_img_writer = fopen('all_img_list.txt', 'w');
-all_label_writer = fopen('all_label_list.txt', 'w');
+all_img_writer   = fopen('test_all_images.txt', 'w');
+all_label_writer = fopen('test_all_labels.txt', 'w');
 
 neg_face_cnt = 0;
 while feof(neg_reader) == 0
@@ -60,8 +60,8 @@ pos_img_files = cell(pos_face_cnt, 1);
 neg_img_files = cell(neg_face_cnt, 1);
 all_img_files = cell(pos_face_cnt + neg_face_cnt, 1);
 all_labels = zeros(pos_face_cnt + neg_face_cnt, 1);
-all_img_reader = fopen('all_img_list.txt', 'r');
-all_label_reader = fopen('all_label_list.txt', 'r');
+all_img_reader   = fopen('test_all_images.txt', 'r');
+all_label_reader = fopen('test_all_labels.txt', 'r');
 
 ind = 0;
 while feof(all_img_reader) == 0

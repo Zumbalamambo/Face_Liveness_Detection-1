@@ -9,21 +9,19 @@ caffe.set_device(int(sys.argv[1]))
 caffe.set_mode_gpu()
 
 # Set paths
-train_prototxt_path = "../model/vgg_face_caffe/train.prototxt"
-val_prototxt_path   = "../model/vgg_face_caffe/val.prototxt"
-test_prototxt_path  = "../model/vgg_face_caffe/test.prototxt"
+dataset_name = "replayattack"
+train_prototxt_path = "../model/{}/train.prototxt".format(dataset_name)
+val_prototxt_path   = "../model/{}/val.prototxt".format(dataset_name)
+solver_path         = "../model/{}/solver.prototxt".format(dataset_name)
+snapshot_path       = "../model/{}/snapshots/{}".format(dataset_name, dataset_name)
 caffemodel_path     = "../model/vgg_face_caffe/VGG_FACE.caffemodel"
-solver_path         = "../model/vgg_face_caffe/solver.prototxt"
-snapshot_path       = "../model/vgg_face_caffe/snapshots/model"
 
 # Create prototxt files
-# TODO:
-# 1. Shall we tweak learning rate?
-# 2. Shall we remove Dropout layer in val.prototxt? No
 train_batch_size = 10
 val_batch_size   = 10
-net.make_net(train_prototxt_path, 'train', train_batch_size, '../data')
-net.make_net(val_prototxt_path, 'val', val_batch_size, , '../data')
+mean = (67.768946, 84.579981, 126.852879)
+net.make_net(train_prototxt_path, 'train', train_batch_size, '../data/{}'.format(dataset_name), mean)
+net.make_net(val_prototxt_path, 'val', val_batch_size, '../data/{}'.format(dataset_name), mean)
 solver.make_solver(train_prototxt_path, val_prototxt_path, solver_path, snapshot_path)
 
 # Read in solver and pre-trained parameters

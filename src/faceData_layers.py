@@ -60,7 +60,7 @@ class BatchLoader(object):
     """
 
 	def __init__(self, params, result):
-			# load image paths and their labels (both are list of strings)
+		# load image paths and their labels (both are list of strings)
 
 		self.data_dir = params['data_dir']
 		self.split = params['split']
