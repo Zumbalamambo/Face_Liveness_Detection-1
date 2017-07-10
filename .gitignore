@@ -11,4 +11,5 @@ data/replayattack/
 model/MSU-MFSD/
 model/cbsr_antispoofing/
 model/replayattack/
+*.pkl
 *.pyc

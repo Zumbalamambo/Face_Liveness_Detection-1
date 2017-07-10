@@ -4,6 +4,8 @@ import numpy as np
 import net
 import solver
 
+import pdb
+
 # init
 caffe.set_device(int(sys.argv[1]))
 caffe.set_mode_gpu()
@@ -27,6 +29,8 @@ solver.make_solver(train_prototxt_path, val_prototxt_path, solver_path, snapshot
 # Read in solver and pre-trained parameters
 mySolver = caffe.get_solver(solver_path)
 mySolver.net.copy_from(caffemodel_path)
+
+pdb.set_trace()
 
 # Ordinary train loop
 test_interval = 500
