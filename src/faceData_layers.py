@@ -3,6 +3,11 @@ import caffe
 import numpy as np
 from PIL import Image
 import copy
+import random
+
+from util import HSVColor
+
+import pdb
 
 """
 Reference: 
@@ -24,7 +29,7 @@ class FaceDataLayer(caffe.Layer):
 		params = eval(self.param_str) # do param_str in python console (create dict)
 
 		self.batch_size = params['batch_size']
-		self.batch_loader = BatchLoader(params, None) # save all other params to loader 
+		self.batch_loader = BatchLoader(params) # save all other params to loader 
 
 		"""
 		since we use a fixed input image size, reshape the data layer only once
@@ -56,35 +61,47 @@ class BatchLoader(object):
 	
 	"""
     This class abstracts away the loading of images (for the ease of debugging)
-    Images are loaded individually.
+    Images are loaded individually (one at a time).
     """
 
-	def __init__(self, params, result):
+	def __init__(self, params):
 		# load image paths and their labels (both are list of strings)
 
-		self.data_dir = params['data_dir']
-		self.split = params['split']
-		self.image_paths = open('{}/{}_images.txt'.format(self.data_dir, self.split)).read().splitlines()
-		self.labels      = open('{}/{}_labels.txt'.format(self.data_dir, self.split)).read().splitlines()
-		
+		self.data_dir   = params['data_dir']
+		self.dataset    = params['dataset']
+		self.split      = params['split']
 		self.batch_size = params['batch_size']
 		self.mean = np.array(params['mean'])
+
+		if self.dataset == 'all':
+			# using all images
+			self.image_paths = open('{}/{}_{}_image_list.txt'.format(self.data_dir, 'all', self.split)).read().splitlines()
+			self.labels      = open('{}/{}_{}_label_list.txt'.format(self.data_dir, 'all', self.split)).read().splitlines()
+		else:
+			# using a specific dataset
+			self.image_paths = open('{}/{}/{}_{}_image_list.txt'.format(self.data_dir, self.dataset, self.dataset, self.split)).read().splitlines()
+			self.labels      = open('{}/{}/{}_{}_label_list.txt'.format(self.data_dir, self.dataset, self.dataset, self.split)).read().splitlines()			
+
+		print 'Shuffling dataset before training...'
 		self._cur = 0 # index of current image
+		self.shuffle_dataset()
 
 	def load_next_pair(self):
 		# return the next batch of (image, label) pairs
 
 		# check whether an epoch has been finished
-		if self._cur == len(self.image_paths):
+		if self._cur >= len(self.image_paths):
 			self._cur = 0
 			self.shuffle_dataset()
 
-		im = np.asarray(Image.open('{}/{}'.format(self.data_dir, self.image_paths[self._cur])))
+		# check the size of the image, resize the image to 256x256 if not
 		label = int(self.labels[self._cur])
 
-		# do a simple horizontal flip as data augmentation
-		flip = np.random.choice(2)*2-1
-		im = im[:, ::flip, :]
+		im_PIL = Image.open(self.image_paths[self._cur])
+
+		# data augmentation
+		# given a PIL image, return a numpy array of float
+		im = self.data_augment(im_PIL)
 
 		self._cur += 1
 		return self.preprocessor(im), label
@@ -100,8 +117,37 @@ class BatchLoader(object):
 		self.image_paths = copy.copy(image_paths_tmp)
 		self.labels = copy.copy(labels_tmp)
 
-		# reset the offset
-		self._cur = 0
+		# reset the offset (offset reset outside this functionality)
+		# self._cur = 0
+
+	def data_augment(self, im_PIL):
+		nrow, ncol = im_PIL.size
+
+		if self.split == 'train':
+			# do data augmentation in training phase
+			if nrow != 256 or ncol != 256:
+				im_PIL = im_PIL.resize((256, 256), Image.ANTIALIAS)
+
+			# convert the image to array and move on
+			im = np.asarray(im_PIL)
+
+			# do a random crop as data augmentation
+			max_offset = 32 # 256 -224
+			w_offset = random.randint(0, max_offset)
+			h_offset = random.randint(0, max_offset)		
+			im = im[h_offset:h_offset+224, w_offset:w_offset+224,:]
+
+			# do a simple horizontal flip as data augmentation
+			flip = np.random.choice(2)*2-1
+			im = im[:, ::flip, :]
+		else:
+			# simply forward the image for testing or validation
+			if nrow != 224 or ncol != 224:
+				im_PIL = im_PIL.resize((224, 224), Image.ANTIALIAS)
+
+			im = np.asarray(im_PIL)
+
+		return im			
 
 	def preprocessor(self, im):
 		"""

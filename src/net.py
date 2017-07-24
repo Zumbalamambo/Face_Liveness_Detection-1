@@ -2,6 +2,8 @@ import caffe
 from caffe import layers as L, params as P
 import os.path
 
+import pdb
+
 def conv_relu(bottom, nout, ks=3, stride=1, pad=1):
     conv = L.Convolution(bottom, kernel_size=ks, stride=stride,
                          num_output=nout, pad=pad,
@@ -20,11 +22,25 @@ def fc_relu_dropout(bottom, nout, ratio, lr_shrink=10):
     dropout = L.Dropout(relu, dropout_ratio=ratio, in_place=True)
     return fc, relu, dropout
 
-def vgg_face(split, batch_size, data_dir, mean):
+def vgg_face(split, mean, opt):
     n = caffe.NetSpec()
 
     # config python data layer
-    pydata_params = dict(split=split, data_dir=data_dir, batch_size=batch_size, mean=mean)
+    if split == 'train':
+        batch_size = opt.train_batch_size
+    if split == 'val':
+        batch_size = opt.val_batch_size
+    if split == 'test':
+        batch_size = opt.test_batch_size
+
+    if split == 'train' or split == 'val':
+        dataset_name = opt.train_dataset_name
+    else:
+        dataset_name = opt.test_dataset_name
+
+    pydata_params = dict(split=split, data_dir=opt.data_dir, 
+                         batch_size=batch_size, mean=mean, 
+                         dataset=dataset_name)
     n.data, n.label = L.Python(module='faceData_layers', layer='FaceDataLayer', 
                                ntop=2, param_str=str(pydata_params))
 
@@ -77,12 +93,12 @@ def vgg_face(split, batch_size, data_dir, mean):
 
     return n.to_proto()
 
-def make_net(net_path, split, batch_size, data_dir, mean):
+def make_net(net_path, split, mean, opt):
     '''
     net_path: path for the prototxt file of the net
     split: 'train' / 'val' / 'test'
-    data_dir: path to the image list .txt files
+    mean: channel mean for the datasets used   
     '''
     print "Writing prototxt file for train net..."
     with open(net_path, 'w') as f:
-        f.write( str ( vgg_face(split, batch_size, data_dir, mean) ) )
+        f.write( str ( vgg_face(split, mean, opt) ) )

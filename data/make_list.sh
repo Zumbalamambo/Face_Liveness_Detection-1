@@ -1,1 +1,1 @@
-python make_image_list.py --name 'cbsr_antispoofing MSU-MFSD' --concat
+python make_list.py --name 'MZDX_HSV MZDX NUAA replayattack cbsr_antispoofing MSU-MFSD' --concat
