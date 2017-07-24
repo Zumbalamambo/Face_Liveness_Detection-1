@@ -17,6 +17,7 @@ parser.add_argument('--test_dataset_name',  type=str, default='myData',  help='n
 parser.add_argument('--data_dir',     type=str, default='../data', help='path to the ROOT data folder (disregard the model and dataset used)')
 parser.add_argument('--model_name',   type=str, default='VggFace', help='name of model to be used for training')
 parser.add_argument('--model_iter',   type=int, default=40000, help='iteration number for the model loaded')
+parser.add_argument('--use_HSV',  action='store_true', help='indicator of using HSV colorspace (set to use)')
 parser.add_argument('--gpu_id',  type=int, default=0,  help='the id of gpu')
 opt = parser.parse_args()
 

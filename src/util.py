@@ -17,8 +17,16 @@ def get_mean_dataset(opt):
 	for image in train_images:
 		# im = np.asarray(Image.open(image))
 		im = cv2.imread(image)
+
+		if opt.use_HSV:
+			im = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
+			
 		mean_value += np.mean(np.mean(im, axis=0), axis=0)
 		cnt += 1
+
+		# print progress since it seems like taking forever to run
+		if cnt % 1000 == 0:
+			print 'Mean calculating progress ({}): {}/{}'.format(opt.train_dataset_name, cnt, len(train_iamges))
 
 	mean_value = mean_value/cnt
 

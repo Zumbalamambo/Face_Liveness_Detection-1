@@ -14,10 +14,12 @@ from util import get_mean_all, get_mean_dataset
 parser = argparse.ArgumentParser()
 parser.add_argument('--train_batch_size', type=int, default=20,  help='batch size for training')
 parser.add_argument('--val_batch_size',   type=int, default=50, help='batch size for validation')
-parser.add_argument('--num_epoch',    type=int, default=5, help='number of epochs')
-parser.add_argument('--data_dir',     type=str, default='../data', help='path to the data folder')
-parser.add_argument('--model_name',   type=str, default='VggFace', help='name of model to be used for training')
-parser.add_argument('--train_dataset_name', type=str, default='MZDX',  help='name of dataset to be used for training')
+parser.add_argument('--num_epoch',     type=int, default=5, help='number of epochs')
+parser.add_argument('--test_interval', type=int, default=200, help='interval for invoking validation/testing')
+parser.add_argument('--data_dir',      type=str, default='../data', help='path to the data folder')
+parser.add_argument('--model_name',    type=str, default='VggFace', help='name of model to be used for training')
+parser.add_argument('--train_dataset_name', type=str, default='MZDX', help='name of dataset to be used for training')
+parser.add_argument('--use_HSV',  action='store_true', help='indicator of using HSV colorspace (set to use)')
 parser.add_argument('--gpu_id',  type=int, default=0,  help='the id of gpu')
 opt = parser.parse_args()
 
@@ -30,13 +32,13 @@ model_path = os.path.join('..', 'model', opt.model_name)
 if not os.path.exists(model_path):
 	os.makedirs(model_path)
 
-caffemodel_path = "../model/{}/{}_model/{}.caffemodel".format(opt.model_name, opt.model_name, opt.model_name)
+caffemodel_path = "{}/{}_model/{}.caffemodel".format(model_path, opt.model_name, opt.model_name)
 if opt.train_dataset_name == 'all':
 	# use all the datasets (all folders have already been makde)
-	train_prototxt_path = "../model/{}/train.prototxt".format(opt.model_name)
-	val_prototxt_path   = "../model/{}/val.prototxt".format(opt.model_name)
-	solver_path         = "../model/{}/solver.prototxt".format(opt.model_name)
-	snapshot_path       = "../model/{}/snapshots/all".format(opt.model_name)	
+	train_prototxt_path = "{}/train.prototxt".format(model_path)
+	val_prototxt_path   = "{}/val.prototxt".format(model_path)
+	solver_path         = "{}/solver.prototxt".format(model_path)
+	snapshot_path       = "{}/snapshots/all".format(model_path)	
 else:	
 	# use a specific dataset (make folder for the dataset model and snapshots)
 	model_dataset_path = os.path.join(model_path, opt.train_dataset_name)
@@ -47,10 +49,10 @@ else:
 	if not os.path.exists(model_dataset_snapshots_path):
 		os.makedirs(model_dataset_snapshots_path)
 
-	train_prototxt_path = "../model/{}/{}/train.prototxt".format(opt.model_name, opt.train_dataset_name)
-	val_prototxt_path   = "../model/{}/{}/val.prototxt".format(opt.model_name, opt.train_dataset_name)
-	solver_path         = "../model/{}/{}/solver.prototxt".format(opt.model_name, opt.train_dataset_name)
-	snapshot_path       = "../model/{}/{}/snapshots/{}".format(opt.model_name, opt.train_dataset_name, opt.train_dataset_name)
+	train_prototxt_path = "{}/train.prototxt".format(model_dataset_snapshots_path)
+	val_prototxt_path   = "{}/val.prototxt".format(model_dataset_snapshots_path)
+	solver_path         = "{}/solver.prototxt".format(model_dataset_snapshots_path)
+	snapshot_path       = "{}/snapshots/{}".format(model_dataset_snapshots_path, opt.train_dataset_name)
 
 '''
 if opt.train_dataset_name == 'all':
@@ -61,16 +63,15 @@ else:
 # MZDX:     dataset_mean = (94.472229, 105.928444, 135.969991)  dataset_size = 164290
 # MZDX_HSV: dataset_mean = (142.461792, 97.860825, 39.395971)   dataset_size = 164290
 
-dataset_mean = (142.461792, 97.860825, 39.395971)
-dataset_size = 164293
+# dataset_mean = (142.461792, 97.860825, 39.395971)
+# dataset_size = 164293
 
 # make prototxt
 net.make_net(train_prototxt_path, 'train',  dataset_mean, opt)
 net.make_net(val_prototxt_path,   'val',    dataset_mean, opt)
-test_interval = 300
 solver.make_solver(train_prototxt_path, val_prototxt_path, 
 				   solver_path, snapshot_path, 
-				   opt, dataset_size, test_interval)
+				   opt, dataset_size, opt.test_interval)
 
 # Read in solver and pre-trained parameters
 mySolver = caffe.get_solver(solver_path)

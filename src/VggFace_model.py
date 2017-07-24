@@ -40,7 +40,7 @@ def vgg_face(split, mean, opt):
 
     pydata_params = dict(split=split, data_dir=opt.data_dir, 
                          batch_size=batch_size, mean=mean, 
-                         dataset=dataset_name)
+                         dataset=dataset_name, use_HSV=opt.use_HSV)
     n.data, n.label = L.Python(module='faceData_layers', layer='FaceDataLayer', 
                                ntop=2, param_str=str(pydata_params))
 

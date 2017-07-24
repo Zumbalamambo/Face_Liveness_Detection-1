@@ -72,6 +72,7 @@ class BatchLoader(object):
 		self.dataset    = params['dataset']
 		self.split      = params['split']
 		self.batch_size = params['batch_size']
+		self.use_HSV    = params['use_HSV']
 		self.mean = np.array(params['mean'])
 
 		if self.dataset == 'all':
@@ -95,12 +96,15 @@ class BatchLoader(object):
 			self._cur = 0
 			self.shuffle_dataset()
 
-		label = int(self.labels[self._cur])
+		#  im_PIL = Image.open(self.image_paths[self._cur])
+
 		im = cv2.imread(self.image_paths[self._cur]) # we switch to use OpenCV to load images
-		# im_PIL = Image.open(self.image_paths[self._cur])
+		if self.use_HSV:
+			im = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
 
 		# data augmentation
 		im = self.data_augment(im)
+		label = int(self.labels[self._cur])
 
 		self._cur += 1
 		return self.preprocessor(im), label
