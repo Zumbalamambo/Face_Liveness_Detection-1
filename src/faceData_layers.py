@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import copy
 import random
+import cv2
 
 from util import HSVColor
 
@@ -94,14 +95,12 @@ class BatchLoader(object):
 			self._cur = 0
 			self.shuffle_dataset()
 
-		# check the size of the image, resize the image to 256x256 if not
 		label = int(self.labels[self._cur])
-
-		im_PIL = Image.open(self.image_paths[self._cur])
+		im = cv2.imread(self.image_paths[self._cur]) # we switch to use OpenCV to load images
+		# im_PIL = Image.open(self.image_paths[self._cur])
 
 		# data augmentation
-		# given a PIL image, return a numpy array of float
-		im = self.data_augment(im_PIL)
+		im = self.data_augment(im)
 
 		self._cur += 1
 		return self.preprocessor(im), label
@@ -120,17 +119,18 @@ class BatchLoader(object):
 		# reset the offset (offset reset outside this functionality)
 		# self._cur = 0
 
-	def data_augment(self, im_PIL):
+	def data_augment(self, im):
 		nrow, ncol = im_PIL.size
 
 		if self.split == 'train':
 			# do data augmentation in training phase
 			if nrow != 256 or ncol != 256:
-				im_PIL = im_PIL.resize((256, 256), Image.ANTIALIAS)
+				im = cv2.resize(im, (256, 256))
 
-			# convert the image to array and move on
-			im = np.asarray(im_PIL)
-
+			
+			# # convert the image to array and move on
+			# im = np.asarray(im_PIL)
+			
 			# do a random crop as data augmentation
 			max_offset = 32 # 256 -224
 			w_offset = random.randint(0, max_offset)
@@ -143,9 +143,9 @@ class BatchLoader(object):
 		else:
 			# simply forward the image for testing or validation
 			if nrow != 224 or ncol != 224:
-				im_PIL = im_PIL.resize((224, 224), Image.ANTIALIAS)
+				im = cv2.resize(im, (224, 224))
 
-			im = np.asarray(im_PIL)
+			# im = np.asarray(im_PIL)
 
 		return im			
 
@@ -153,13 +153,13 @@ class BatchLoader(object):
 		"""
 		preprocess the image for caffe use:
 		- cast to float
-		- switch channels RGB -> BGR
+		# we do not do this anymore whenever using OpenCV ==> - switch channels RGB -> BGR 
 		- subtract mean
 		- transpose to channel x height x width order
 		"""
 
 		im = np.array(im, dtype=np.float32)
-		im = im[:,:,::-1] # RGB -> BGR
+		# im = im[:,:,::-1] # RGB -> BGR
 		im -= self.mean # the order of mean should be BGR
 		im = im.transpose((2, 0, 1))
 		return im
