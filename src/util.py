@@ -2,6 +2,8 @@ import os
 from PIL import Image
 import colorsys
 import numpy as np
+import cv2
+
 '''
 For training dataset, return both mean and size
 '''
@@ -13,14 +15,15 @@ def get_mean_dataset(opt):
 	mean_value = np.array([0, 0, 0], dtype=np.float64)
 	cnt = 0
 	for image in train_images:
-		im = np.asarray(Image.open(image))
+		# im = np.asarray(Image.open(image))
+		im = cv2.imread(image)
 		mean_value += np.mean(np.mean(im, axis=0), axis=0)
 		cnt += 1
 
 	mean_value = mean_value/cnt
 
-	# RGB -> BGR
-	mean_value = mean_value[::-1]
+	# we do not do this anymore whenever using OpenCV for image loading ==> RGB -> BGR
+	#mean_value = mean_value[::-1]
 
 	print 'mean value for %s is (%f, %f, %f) ' % (opt.train_dataset_name, mean_value[0], mean_value[1], mean_value[2])
 	print 'total number of training samples are %d' % cnt
