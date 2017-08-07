@@ -40,7 +40,8 @@ def vgg_face(split, mean, opt):
 
     pydata_params = dict(split=split, data_dir=opt.data_dir, 
                          batch_size=batch_size, mean=mean, 
-                         dataset=dataset_name, use_HSV=opt.use_HSV)
+                         dataset=dataset_name, use_HSV=opt.use_HSV, 
+                         load_size=opt.load_size, crop_size=opt.crop_size)
     n.data, n.label = L.Python(module='faceData_layers', layer='FaceDataLayer', 
                                ntop=2, param_str=str(pydata_params))
 
@@ -72,7 +73,8 @@ def vgg_face(split, mean, opt):
     # drop out and fc layers
     n.fc6, n.relu6, n.drop6 = fc_relu_dropout(n.pool5, 4096, 0.5)
     n.fc7, n.relu7, n.drop7 = fc_relu_dropout(n.fc6, 4096, 0.5)
-    lr_ratio = 100 # ratio for lr of params being learned and tuned
+    
+    lr_ratio = 100 # lr multiplier for truncated layers
     n.fc8_face = L.InnerProduct(n.fc7, num_output=1024, 
                                 param=[dict(lr_mult=1*lr_ratio, decay_mult=1), dict(lr_mult=2*lr_ratio, decay_mult=0)], 
                                 weight_filler=dict(type='gaussian', std=0.01), 
@@ -87,8 +89,7 @@ def vgg_face(split, mean, opt):
     # loss layer
     n.loss = L.SoftmaxWithLoss(n.fc9_face, n.label)
 
-    # accuracy layer for validation net
-    if split == 'val':
-        n.acc = L.Accuracy(n.fc9_face, n.label)
-
+    # loss and accuracy layer
+    n.loss = L.SoftmaxWithLoss(n.fc_face2, n.label)
+    n.acc = L.Accuracy(n.fc_face2, n.label)
     return n.to_proto()

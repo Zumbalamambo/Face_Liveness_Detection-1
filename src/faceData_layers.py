@@ -73,6 +73,8 @@ class BatchLoader(object):
 		self.split      = params['split']
 		self.batch_size = params['batch_size']
 		self.use_HSV    = params['use_HSV']
+		self.load_size  = params['load_size']
+		self.crop_size  = params['crop_size']
 		self.mean = np.array(params['mean'])
 
 		if self.dataset == 'all':
@@ -124,30 +126,30 @@ class BatchLoader(object):
 		# self._cur = 0
 
 	def data_augment(self, im):
-		nrow, ncol = im_PIL.size
+		(nrow, ncol, nchannel) = im.shape
 
 		if self.split == 'train':
 			# do data augmentation in training phase
-			if nrow != 256 or ncol != 256:
-				im = cv2.resize(im, (256, 256))
+			if nrow != opt.load_size or ncol != opt.load_size:
+				im = cv2.resize(im, (opt.load_size, opt.load_size))
 
 			
 			# # convert the image to array and move on
 			# im = np.asarray(im_PIL)
 			
 			# do a random crop as data augmentation
-			max_offset = 32 # 256 -224
+			max_offset = opt.load_size - opt.crop_size # 256 -224
 			w_offset = random.randint(0, max_offset)
 			h_offset = random.randint(0, max_offset)		
-			im = im[h_offset:h_offset+224, w_offset:w_offset+224,:]
+			im = im[h_offset:h_offset+opt.crop_size, w_offset:w_offset+opt.crop_size,:]
 
 			# do a simple horizontal flip as data augmentation
 			flip = np.random.choice(2)*2-1
 			im = im[:, ::flip, :]
 		else:
 			# simply forward the image for testing or validation
-			if nrow != 224 or ncol != 224:
-				im = cv2.resize(im, (224, 224))
+			if nrow != opt.crop_size or ncol != opt.crop_size:
+				im = cv2.resize(im, (opt.crop_size, opt.crop_size))
 
 			# im = np.asarray(im_PIL)
 

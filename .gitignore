@@ -12,6 +12,6 @@ data/MSU-MFSD/
 data/NUAA/
 data/cbsr_antispoofing/
 data/replayattack/
+data/MZDX_eye
 
-model/VggFace/
-model/ResNet/
+model/

@@ -76,31 +76,31 @@ if __name__ == '__main__':
 		# get the file list and create the label list (only file names are obtained)
 		train_pos_files, train_neg_files, val_pos_files, val_neg_files, test_pos_files, test_neg_files = get_img_list(dataset_path)
 
-		train_files = train_neg_files + train_pos_files
-		test_files  = test_neg_files  + test_pos_files	
-		val_files   = val_neg_files   + val_pos_files
+		train_files = train_pos_files + train_neg_files
+		val_files   = val_pos_files   + val_neg_files
+		test_files  = test_pos_files  + test_neg_files	
 
 		train_labels = [1] * len(train_pos_files) + [0] * len(train_neg_files)
-		test_labels  = [1] * len(test_pos_files)  + [0] * len(test_neg_files)
 		val_labels   = [1] * len(val_pos_files)   + [0] * len(val_neg_files)
+		test_labels  = [1] * len(test_pos_files)  + [0] * len(test_neg_files)
 
 		# write the result into files
 		write_list_file(dataset_path, dataset, 'train', train_files, train_labels)
-		write_list_file(dataset_path, dataset, 'test',  test_files,  test_labels)
 		write_list_file(dataset_path, dataset, 'val',   val_files,   val_labels)
+		write_list_file(dataset_path, dataset, 'test',  test_files,  test_labels)
 
 		if doConcat:
 			all_train_files  += train_files
 			all_train_labels += train_labels
-			all_test_files   += test_files
-			all_test_labels  += test_labels
 			all_val_files    += val_files
 			all_val_labels   += val_labels
+			all_test_files   += test_files
+			all_test_labels  += test_labels
 
 	if doConcat:
 		# write the result into files
 		print '====================================================================='
 		print 'Creating image and label list for all datasets'
 		write_list_file(cur_path, 'all', 'train', all_train_files, all_train_labels)
-		write_list_file(cur_path, 'all', 'test',  all_test_files,  all_test_labels)
 		write_list_file(cur_path, 'all', 'val',   all_val_files,   all_val_labels)
+		write_list_file(cur_path, 'all', 'test',  all_test_files,  all_test_labels)
