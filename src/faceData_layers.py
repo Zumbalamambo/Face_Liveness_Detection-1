@@ -36,7 +36,7 @@ class FaceDataLayer(caffe.Layer):
 		since we use a fixed input image size, reshape the data layer only once
 		and save it from be called every time in reshape()
 		"""
-		top[0].reshape(self.batch_size, 3, 224, 224)
+		top[0].reshape(self.batch_size, 3, self.batch_loader.crop_size, self.batch_loader.crop_size)
 		top[1].reshape(self.batch_size, 1)
 
 	def forward(self, bottom, top):
@@ -130,26 +130,26 @@ class BatchLoader(object):
 
 		if self.split == 'train':
 			# do data augmentation in training phase
-			if nrow != opt.load_size or ncol != opt.load_size:
-				im = cv2.resize(im, (opt.load_size, opt.load_size))
+			if nrow != self.load_size or ncol != self.load_size:
+				im = cv2.resize(im, (self.load_size, self.load_size))
 
 			
 			# # convert the image to array and move on
 			# im = np.asarray(im_PIL)
 			
 			# do a random crop as data augmentation
-			max_offset = opt.load_size - opt.crop_size # 256 -224
+			max_offset = self.load_size - self.crop_size # 256 -224
 			w_offset = random.randint(0, max_offset)
 			h_offset = random.randint(0, max_offset)		
-			im = im[h_offset:h_offset+opt.crop_size, w_offset:w_offset+opt.crop_size,:]
+			im = im[h_offset:h_offset+self.crop_size, w_offset:w_offset+self.crop_size,:]
 
 			# do a simple horizontal flip as data augmentation
 			flip = np.random.choice(2)*2-1
 			im = im[:, ::flip, :]
 		else:
 			# simply forward the image for testing or validation
-			if nrow != opt.crop_size or ncol != opt.crop_size:
-				im = cv2.resize(im, (opt.crop_size, opt.crop_size))
+			if nrow != self.crop_size or ncol != self.crop_size:
+				im = cv2.resize(im, (self.crop_size, self.crop_size))
 
 			# im = np.asarray(im_PIL)
 

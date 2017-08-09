@@ -74,8 +74,8 @@ else:
 # MZDX_eye:  dataset_mean = (81.237413, 95.646728, 131.313932)  dataset_size = 164976
 # MZDX(HSV): dataset_mean = (27.426452, 97.793206, 142.434513)  dataset_size = 164290
 
-dataset_mean = (81.237413, 95.646728, 131.313932)
-dataset_size = 164976
+dataset_mean = (86.675902, 100.892992, 133.855434)
+dataset_size = 342559
 
 '''
 if opt.train_dataset_name == 'all':

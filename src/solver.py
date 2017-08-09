@@ -29,7 +29,7 @@ def make_solver(train_net_path, val_net_path, solver_path, snapshot_path, opt, d
 
 	# specify other helper parameters
 	s.display = 20
-	s.snapshot = 5000
+	s.snapshot = 2500
 	s.snapshot_prefix = snapshot_path
 	s.solver_mode = caffe_pb2.SolverParameter.GPU
 

@@ -1,5 +1,6 @@
 from VggFace_model import vgg_face
 from ResNet_model  import resnet50, resnet18
+from SqueezeNet_model import squeeze_net
 
 def make_net(net_path, split, mean, opt):
     '''
@@ -15,5 +16,7 @@ def make_net(net_path, split, mean, opt):
             f.write( str ( resnet50(split, mean, opt) ) )
         elif opt.model_name == 'ResNet18':
             f.write( str ( resnet18(split, mean, opt) ) )
+        elif opt.model_name == 'SqueezeNet':
+            f.write( str ( squeeze_net(split, mean, opt) ) )
         else:
             raise ValueError('Unrecognized network type')

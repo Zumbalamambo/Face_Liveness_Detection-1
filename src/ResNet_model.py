@@ -125,8 +125,7 @@ def resnet18(split, mean, opt):
     #   2. do not use bias_term for convolution layer before start of residual blocks
     #   3. do not set the BN layer parameter, moving_average_fraction, to 0.9 (using default value 0.999)
     #   4. for weight filter initialziation, we do not specify 'msra'
-    n.conv1, n.bn_conv1, n.scale_conv1 = _conv_bn_scale(
-        n.data, 64, bias_term=False, kernel_size=7, pad=3, stride=2)
+    n.conv1, n.bn_conv1, n.scale_conv1 = _conv_bn_scale(n.data, 64, bias_term=False, kernel_size=7, pad=3, stride=2)
     n.conv1_relu = L.ReLU(n.scale_conv1, in_place=True)
     n.pool1 = L.Pooling(n.conv1_relu, kernel_size=3, stride=2, pool=P.Pooling.MAX)
 
@@ -186,8 +185,7 @@ def resnet50(split, mean, opt):
                                ntop=2, param_str=str(pydata_params))
 
     # start building main body of network
-    n.conv1, n.bn_conv1, n.scale_conv1 = _conv_bn_scale(
-        n.data, 64, bias_term=True, kernel_size=7, pad=3, stride=2)
+    n.conv1, n.bn_conv1, n.scale_conv1 = _conv_bn_scale(n.data, 64, bias_term=True, kernel_size=7, pad=3, stride=2)
     n.conv1_relu = L.ReLU(n.scale_conv1)
     n.pool1 = L.Pooling(n.conv1_relu, kernel_size=3, stride=2, pool=P.Pooling.MAX)
 
