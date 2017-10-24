@@ -34,7 +34,7 @@ parser.add_argument('--model_name', type=str, default='VggFace', help='name of m
 parser.add_argument('--train_dataset_name', type=str, default='MZDX', help='name of dataset to be used for training')
 
 # Ohers
-# parser.add_argument('--from_scratch', action='store_true', help='indicator of training from scratch (set to true)')
+parser.add_argument('--exp_suffix', type=str, default='', help='prefix to distinguish between different experiment settings')
 parser.add_argument('--use_HSV', action='store_true', help='indicator of using HSV colorspace (set to use)')
 parser.add_argument('--gpu_id',  type=int, default=0, help='the id of gpu')
 
@@ -49,11 +49,15 @@ caffe.set_mode_gpu()
 # set paths
 model_path = os.path.join('..', 'model', opt.model_name)
 HSV_suffix = '_HSV' if opt.use_HSV else ''
+if not opt.exp_suffix == '':
+	opt.exp_suffix = '_' + opt.exp_suffix
+suffix = HSV_suffix + opt.exp_suffix # suffix to distinguish models over experiments
+
 if opt.train_dataset_name == 'all':
 	train_prototxt_path = "{}/train{}.prototxt".format(model_path, HSV_suffix)
 	val_prototxt_path   = "{}/val{}.prototxt".format(model_path, HSV_suffix)
 	solver_path         = "{}/solver{}.prototxt".format(model_path, HSV_suffix)
-	snapshot_path       = "{}/snapshots/all{}".format(model_path, HSV_suffix)	
+	snapshot_path       = "{}/snapshots/all{}".format(model_path, suffix)	
 else:
 	model_dataset_path = os.path.join(model_path, opt.train_dataset_name)
 	model_dataset_snapshots_path = os.path.join(model_dataset_path, 'snapshots')
@@ -61,7 +65,7 @@ else:
 	train_prototxt_path = "{}/train{}.prototxt".format(model_dataset_path, HSV_suffix)
 	val_prototxt_path   = "{}/val{}.prototxt".format(model_dataset_path, HSV_suffix)
 	solver_path         = "{}/solver{}.prototxt".format(model_dataset_path, HSV_suffix)
-	snapshot_path       = "{}/{}".format(model_dataset_snapshots_path, opt.train_dataset_name + HSV_suffix)
+	snapshot_path       = "{}/{}".format(model_dataset_snapshots_path, suffix)
 
 # Compute mean value
 # all:      dataset_mean = (86.675902, 100.892992, 133.855434)   dataset_size = 342559

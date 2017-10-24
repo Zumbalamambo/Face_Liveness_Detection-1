@@ -15,12 +15,17 @@ Define options
 '''
 parser = argparse.ArgumentParser()
 
+parser.add_argument('--load_size',  type=int, default=256, help='default load size of training samples')
+parser.add_argument('--crop_size',  type=int, default=224, help='default crop size of training samples')
 parser.add_argument('--test_batch_size',    type=int, default=100, help='batch size for testing')
+
 parser.add_argument('--train_dataset_name', type=str, default='MZDX',  help='name of dataset used for training')
 parser.add_argument('--test_dataset_name',  type=str, default='MZDX',  help='name of dataset to be used for testing')
 parser.add_argument('--data_dir',     type=str, default='../data', help='path to the ROOT data folder (disregard the model and dataset used)')
 parser.add_argument('--model_name',   type=str, default='VggFace', help='name of model to be used for training')
 parser.add_argument('--model_iter',   type=int, default=40000, help='iteration number for the model loaded')
+
+parser.add_argument('--exp_suffix', type=str, default='', help='prefix to distinguish between different experiment settings')
 parser.add_argument('--use_HSV',  action='store_true', help='indicator of using HSV colorspace (set to use)')
 parser.add_argument('--gpu_id',  type=int, default=0,  help='the id of gpu')
 
@@ -34,12 +39,16 @@ caffe.set_mode_gpu()
 
 # define path
 HSV_suffix = '_HSV' if opt.use_HSV else ''
+if not opt.exp_suffix == '':
+	opt.exp_suffix = '_' + opt.exp_suffix
+suffix = HSV_suffix + opt.exp_suffix # suffix to distinguish models over experiments
+
 if opt.train_dataset_name == 'all':
 	snapshot_path = '../model/{}/snapshots'.format(opt.model_name)
-	test_prototxt_path = '../model/{}/test{}.prototxt'.format(opt.model_name, HSV_suffix)
+	test_prototxt_path = '../model/{}/test{}.prototxt'.format(opt.model_name, suffix)
 else:
 	snapshot_path = '../model/{}/{}/snapshots'.format(opt.model_name, opt.train_dataset_name)
-	test_prototxt_path = '../model/{}/{}/test{}.prototxt'.format(opt.model_name, opt.train_dataset_name, HSV_suffix)	
+	test_prototxt_path = '../model/{}/{}/test{}.prototxt'.format(opt.model_name, opt.train_dataset_name, suffix)	
 
 '''
 Make Prototxt files
@@ -53,7 +62,7 @@ Make Prototxt files
 # replayattack: dataset_mean = (70.146368, 85.030646, 124.795727), dataset_size = 107257
 
 # MZDX_eye:  dataset_mean = (81.237413, 95.646728, 131.313932)  dataset_size = 164976
-train_dataset_mean = (81.237413, 95.646728, 131.313932)
+train_dataset_mean = (86.675902, 100.892992, 133.855434)
 net.make_net(test_prototxt_path, 'test', train_dataset_mean, opt)
 
 # load net
@@ -82,6 +91,9 @@ for iter in range(niter):
 		pred_layer_name = 'fc9_face'
 	elif opt.model_name == 'ResNet50' or opt.model_name == 'ResNet18':
 		pred_layer_name = 'fc_face2'
+	elif opt.model_name == 'SqueezeNet':
+		pred_layer_name = 'fc_face'
+
 
 	preds  = net.blobs[pred_layer_name].data.argmax(axis=1)
 	labels = np.ndarray.flatten(net.blobs['label'].data)
